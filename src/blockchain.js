@@ -11,6 +11,7 @@
 const SHA256 = require('crypto-js/sha256');
 const BlockClass = require('./block.js');
 const bitcoinMessage = require('bitcoinjs-message');
+const Block = require('bitcoinjs-lib/src/block');
 
 class Blockchain {
 
@@ -64,7 +65,19 @@ class Blockchain {
     _addBlock(block) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-           
+            let length_before =  self.chain.length;
+            block.time = new Date().getTime().toString().slice(0,-3); //time
+            block.height = self.chain.length; //height of the block
+           if(this.height > 0){
+               block.previousBlockHash = self.chain[self.chain.length-1].hash;
+           }
+           block.hash = SHA256(JSON.stringify(block)).toString();
+           self.chain.push(block);
+           if(length_before<self.chain.length){
+               resolve("Block added succefully to the chain.")
+           }else{
+               reject("Somthing went wrong while adding the block!!")
+           }
         });
     }
 
@@ -78,7 +91,7 @@ class Blockchain {
      */
     requestMessageOwnershipVerification(address) {
         return new Promise((resolve) => {
-            
+            resolve(`${address}:${new Date().getTime().toString().slice(0,-3)}:starRegistry`)
         });
     }
 
@@ -102,7 +115,19 @@ class Blockchain {
     submitStar(address, message, signature, star) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            
+            let time =  parseInt(message.split(':')[0]);
+            let currenTime = parseInt(new Date().getTime().toString().slice(0,-3));
+            if((currenTime-time < 5)){
+                if(bitcoinMessage.verify(message,address,signature)){
+                    let block = new Block(star);
+                    this._addBlock(block)
+                    resolve(block);
+                }else{
+                    reject("wrong signature!!");
+                }
+            }else{
+                resolve("wrong time elapse");
+            }
         });
     }
 
@@ -115,7 +140,13 @@ class Blockchain {
     getBlockByHash(hash) {
         let self = this;
         return new Promise((resolve, reject) => {
-           
+           this.chain.forEach(block => {
+               if(block.hash === hash){
+                   resolve(block);
+                   return
+               }
+           });
+           reject("Block not found!")
         });
     }
 
@@ -146,7 +177,8 @@ class Blockchain {
         let self = this;
         let stars = [];
         return new Promise((resolve, reject) => {
-            
+            let block = this.chain.filter(block => bitcoinMessage.verify(await block.getData().signature));
+            block ? resolve(block) : resolve("block not founnd!");
         });
     }
 
@@ -160,7 +192,13 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            
+            let index = 0;
+            let found = false;
+            while (index < this.chain.length-1 && !found) {
+                if(!this.chain[index].validate()) found =true;
+                index++;
+            }
+            !found ? resolve("VALID CHAIN!"): reject("CHAIN NOT VALID");
         });
     }
 
