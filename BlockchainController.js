@@ -41,7 +41,7 @@ class BlockchainController {
         this.app.post("/requestValidation", async (req, res) => {
             if(req.body.address) {
                 const address = req.body.address;
-                const message = "hellow"; //await this.blockchain.requestMessageOwnershipVerification(address);
+                const message = await this.blockchain.requestMessageOwnershipVerification(address);
                 if(message){
                     return res.status(200).json(message);
                 } else {
@@ -82,8 +82,8 @@ class BlockchainController {
         this.app.get("/block/hash/:hash", async (req, res) => {
             if(req.params.hash) {
                 const hash = req.params.hash;
-                //let block = await this.blockchain.getBlockByHash(hash);
-                if(false){
+                let block = await this.blockchain.getBlockByHash(hash);
+                if(block){
                     return res.status(200).json(block);
                 } else {
                     return res.status(404).send("Block Not Found!");

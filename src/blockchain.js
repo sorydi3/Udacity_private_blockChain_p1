@@ -68,7 +68,7 @@ class Blockchain {
             let length_before =  self.chain.length;
             block.time = new Date().getTime().toString().slice(0,-3); //time
             block.height = self.chain.length; //height of the block
-           if(this.height > 0){
+           if(self.height > 0){
                block.previousBlockHash = self.chain[self.chain.length-1].hash;
            }
            block.hash = SHA256(JSON.stringify(block)).toString();
@@ -76,7 +76,7 @@ class Blockchain {
            if(length_before<self.chain.length){
                resolve("Block added succefully to the chain.")
            }else{
-               reject("Somthing went wrong while adding the block!!")
+               resolve(null)
            }
         });
     }
@@ -120,7 +120,7 @@ class Blockchain {
             if((currenTime-time < 5)){
                 if(bitcoinMessage.verify(message,address,signature)){
                     let block = new Block(star);
-                    this._addBlock(block)
+                    self._addBlock(block)
                     resolve(block);
                 }else{
                     reject("wrong signature!!");
@@ -177,8 +177,8 @@ class Blockchain {
         let self = this;
         let stars = [];
         return new Promise((resolve, reject) => {
-            let block = this.chain.filter(block => bitcoinMessage.verify(await block.getData().signature));
-            block ? resolve(block) : resolve("block not founnd!");
+            //let block = self.chain.filter(block => bitcoinMessage.verify(await block.getData().signature));
+            //block ? resolve(block) : reject("block not founnd!");
         });
     }
 
