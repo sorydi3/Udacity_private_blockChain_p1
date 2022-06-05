@@ -26,6 +26,7 @@ class Blockchain {
     constructor() {
         this.chain = [];
         this.height = -1;
+        this.time = 5;
         this.initializeChain();
     }
 
@@ -65,20 +66,16 @@ class Blockchain {
     _addBlock(block) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            let length_before =  self.chain.length;
+            console.log(`ADDING BLOCK TO THE CHAIN. HEIGHT IS ${self.height}`)
             block.time = new Date().getTime().toString().slice(0,-3); //time
             if(self.height >= 0){
                 block.previousBlockHash = self.chain[self.chain.length-1].hash;
             }
             block.hash = SHA256(JSON.stringify(block)).toString();
             self.chain.push(block);
-            self.height = self.chain.length-1;
-            block.height = self.height; //height of the block
-           if(length_before<self.chain.length){
-               resolve("Block added succefully to the chain.")
-           }else{
-               resolve(null)
-           }
+            self.height = self.chain.length;
+            block.height = self.height-1; //height of the block
+            console.log(`ADDING BLOCK TO THE CHAIN. HEIGHT IS ${self.height}`)
         });
     }
 
@@ -92,9 +89,21 @@ class Blockchain {
      */
     requestMessageOwnershipVerification(address) {
         return new Promise((resolve) => {
-            resolve(`${address}:${new Date().getTime().toString().slice(0,-3)}:starRegistry`)
+            resolve(`${address}:${new Date().getTime().toString()}:starRegistry`)
         });
     }
+
+
+    /**
+     * 
+     * This function will return the difference between the two dates (in milliseconts)
+     *  in minutes.
+     * @param { Date must be millisecond} Date1 
+     * @param {Date must be millisecond } Date2 
+     * @returns 
+     */
+     convertMilToMinut = (Date1,Date2) => Math.abs(Math.floor(((Date2-Date1)/1000)/60));
+
 
     /**
      * The submitStar(address, message, signature, star) method
@@ -117,22 +126,30 @@ class Blockchain {
         let self = this;
         return new Promise(async (resolve, reject) => {
             let time =  parseInt(message.split(':')[1]);
-            let currenTime = parseInt(new Date().getTime().toString().slice(0,-3));
-            if(true){ // check time elapse 
+            let currenTime = parseInt(new Date().getTime().toString());
+            let timeDiff = self.convertMilToMinut(currenTime,time);
+            console.log(`Submintting start to the chain --> ${self.height}`)
+            if(timeDiff<=self.time){ // check time elapse 
                 let ok = bitcoinMessage.verify(message,address,signature); // we make sure the signature is correcte
                 if(ok){ 
                     let block = new BlockClass.Block(star);
                     self._addBlock(block)
                     resolve(block);
+                    console.log(`start submitedt to the chain --> ${self.height}`)
                 }else{
+                    console.log(`start  not submitedt to the chain verify fail --> ${self.height}`)
                     reject("wrong signature!!"); 
                 }
             }else{
-                resolve("wrong time elapsce");
+            let timeDiff = self.convertMilToMinut(currenTime,time);
+                console.log(`start  not submitedt to the chain time fail --> ${self.height} time diff is ${timeDiff}`)
+                resolve(`wrong time elapsce ${timeDiff}`);
+
             }
         });
     }
 
+    
     /**
      * This method will return a Promise that will resolve with the Block
      *  with the hash passed as a parameter.

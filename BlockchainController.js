@@ -16,6 +16,7 @@ class BlockchainController {
         this.submitStar();
         this.getBlockByHash();
         this.getStarsByOwner();
+        this.getChainHeight();
     }
 
     // Enpoint to Get a Block by Height (GET Endpoint)
@@ -115,6 +116,15 @@ class BlockchainController {
                 return res.status(500).send("Block Not Found! Review the Parameters!");
             }
             
+        });
+    }
+
+
+    getChainHeight(){
+        this.app.get("/chain/height",async (req,res) =>{
+            const height = await this.blockchain.getChainHeight();
+            //console.log(`THE HEIGHT OF THE CHAIN IS --> ${height}`)
+            height ? res.status(200).send(height) : res.status(404).send("EMPTY CHAIN!");
         });
     }
 
