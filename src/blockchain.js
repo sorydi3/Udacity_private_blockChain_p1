@@ -116,18 +116,19 @@ class Blockchain {
     submitStar(address, message, signature, star) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            let time =  parseInt(message.split(':')[0]);
+            let time =  parseInt(message.split(':')[1]);
             let currenTime = parseInt(new Date().getTime().toString().slice(0,-3));
             if(true){ // check time elapse 
-                if(true){ //bitcoinMessage.verify(message,address,signature)
+                let ok = bitcoinMessage.verify(message,address,signature); // we make sure the signature is correcte
+                if(ok){ 
                     let block = new BlockClass.Block(star);
                     self._addBlock(block)
                     resolve(block);
                 }else{
-                    reject("wrong signature!!");
+                    reject("wrong signature!!"); 
                 }
             }else{
-                resolve("wrong time elapse");
+                resolve("wrong time elapsce");
             }
         });
     }
@@ -195,8 +196,17 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             let index = 0;
             let found = false;
-            while (index < this.chain.length-1 && !found) {
+            while (!found && index < this.chain.length-1) {
+
+                //validate the block
                 if(!this.chain[index].validate()) found =true;
+
+                //validate the links
+                if(this.chain.length>1){ // on if we have more than one block in the chain
+                    let cur_hash = this.chain[index].hash;
+                    let prev_hash = this.chain[index+1];
+                    if(cur_hash!==prev_hash) found = true;
+                }
                 index++;
             }
             !found ? resolve("VALID CHAIN!"): reject("CHAIN NOT VALID");

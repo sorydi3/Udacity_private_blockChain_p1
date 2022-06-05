@@ -68,7 +68,6 @@ class Block {
      */
     getBData() {
         return new Promise((resolve,reject) => {
-
             if(this.Block.height>0){
                 // Getting the encoded data saved in the Block
                 let l_data = hex2ascii(this.data);
