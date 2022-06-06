@@ -134,7 +134,7 @@ class Blockchain {
                 if(ok){ 
                     let block = new BlockClass.Block({star,message,address,signature});
                     self._addBlock(block)
-                    resolve(block);
+                    resolve(await block.getBData());
                     console.log(`start submitedt to the chain --> ${self.height}`)
                 }else{
                     console.log(`start  not submitedt to the chain verify fail --> ${self.height}`)
