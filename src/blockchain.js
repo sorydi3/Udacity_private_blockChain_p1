@@ -26,7 +26,7 @@ class Blockchain {
     constructor() {
         this.chain = [];
         this.height = -1;
-        this.time = 5;
+        this.time = 120;
         this.initializeChain();
     }
 
@@ -132,7 +132,7 @@ class Blockchain {
             if(timeDiff<=self.time){ // check time elapse 
                 let ok = bitcoinMessage.verify(message,address,signature); // we make sure the signature is correcte
                 if(ok){ 
-                    let block = new BlockClass.Block(star);
+                    let block = new BlockClass.Block({star,message,address,signature});
                     self._addBlock(block)
                     resolve(block);
                     console.log(`start submitedt to the chain --> ${self.height}`)
@@ -196,7 +196,12 @@ class Blockchain {
         let self = this;
         let stars = [];
         return new Promise((resolve, reject) => {
-            //let block = self.chain.filter(block => bitcoinMessage.verify(await block.getData().signature));
+            for (let index = 0; index < self.chain.length; index++) {
+                const block = self.chain[index];
+                
+            }
+
+            //let block = self.chain.filter(block => {bitcoinMessage.verify(await block.getData().signature));
             //block ? resolve(block) : reject("block not founnd!");
         });
     }

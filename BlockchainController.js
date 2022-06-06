@@ -66,7 +66,7 @@ class BlockchainController {
                 try {
                     let block = await this.blockchain.submitStar(address, message, signature, star);
                     if(block){
-                        return res.status(200).json(block);
+                        return res.status(200).json(await block.body);
                     } else {
                         return res.status(500).send("An error happened!");
                     }
@@ -103,8 +103,8 @@ class BlockchainController {
             if(req.params.address) {
                 const address = req.params.address;
                 try {
-                    //let stars = await this.blockchain.getStarsByWalletAddress(address);
-                    if(false){
+                    let stars = await this.blockchain.getStarsByWalletAddress(address);
+                    if(stars){
                         return res.status(200).json(stars);
                     } else {
                         return res.status(404).send("Block Not Found!");
@@ -124,7 +124,9 @@ class BlockchainController {
         this.app.get("/chain/height",async (req,res) =>{
             const height = await this.blockchain.getChainHeight();
             //console.log(`THE HEIGHT OF THE CHAIN IS --> ${height}`)
-            height ? res.status(200).send(height) : res.status(404).send("EMPTY CHAIN!");
+            if(height){
+                return res.status(200).json(height);
+            }else return res.status(404).send("EMPTY CHAIN!");
         });
     }
 

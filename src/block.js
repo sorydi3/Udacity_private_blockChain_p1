@@ -67,12 +67,14 @@ class Block {
      *     or Reject with an error.
      */
     getBData() {
+        let self =this;
         return new Promise((resolve,reject) => {
-            if(this.Block.height>0){
+            if(self.height>0){
                 // Getting the encoded data saved in the Block
-                let l_data = hex2ascii(this.data);
+                let l_data = hex2ascii(self.body);
+                console.log("dataaaaaaa" + l_data);
                 // Decoding the data to retrieve the JSON representation of the object
-                let l_jsonObject = JSON.parse(data);
+                let l_jsonObject = JSON.parse(l_data);
                 resolve(l_data);
             }else  reject("Sorry the genesis block does not have data stored!");
         });
