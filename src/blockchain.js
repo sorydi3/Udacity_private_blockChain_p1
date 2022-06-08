@@ -134,16 +134,13 @@ class Blockchain {
                 if(ok){ 
                     let block = new BlockClass.Block({star,message,address,signature});
                     self._addBlock(block)
-                    resolve(await block.getBData());
-                    console.log(`start submitedt to the chain --> ${self.height}`)
+                    resolve( self._viewObject(await block.getBData()));
                 }else{
-                    console.log(`start  not submitedt to the chain verify fail --> ${self.height}`)
                     reject("wrong signature!!"); 
                 }
             }else{
             let timeDiff = self.convertMilToMinut(currenTime,time);
-                console.log(`start  not submitedt to the chain time fail --> ${self.height} time diff is ${timeDiff}`)
-                resolve(`wrong time elapsce ${timeDiff}`);
+                resolve(`wrong time elapce ${timeDiff}`);
 
             }
         });
@@ -195,15 +192,23 @@ class Blockchain {
     getStarsByWalletAddress (address) {
         let self = this;
         let stars = [];
-        return new Promise((resolve, reject) => {
-            for (let index = 0; index < self.chain.length; index++) {
+        return new Promise(async (resolve, reject) => {
+            for (let index = 1; index < self.chain.length; index++) {
                 const block = self.chain[index];
-                
+                let jsonObject = await block.getBData();
+                let ok = bitcoinMessage.verify(jsonObject.message,address,jsonObject.signature);
+                if (ok) stars.push(self._viewObject(jsonObject));
             }
-
-            //let block = self.chain.filter(block => {bitcoinMessage.verify(await block.getData().signature));
-            //block ? resolve(block) : reject("block not founnd!");
+            resolve(stars);
         });
+    }
+
+
+    _viewObject (object) {
+        let l_object = {};
+        l_object['star'] = object.start;
+        l_object['owner'] = object.owner;
+        return l_object;
     }
 
     /**
@@ -219,7 +224,6 @@ class Blockchain {
             let index = 0;
             let found = false;
             while (!found && index < this.chain.length-1) {
-
                 //validate the block
                 if(!this.chain[index].validate()) found =true;
 

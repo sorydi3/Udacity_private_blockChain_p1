@@ -111,7 +111,7 @@ class BlockchainController {
                         return res.status(404).send("Block Not Found!");
                     }
                 } catch (error) {
-                    return res.status(500).send("An error happened!");
+                    return res.status(500).send(error);
                 }
             } else {
                 return res.status(500).send("Block Not Found! Review the Parameters!");

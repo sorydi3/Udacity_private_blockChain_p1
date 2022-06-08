@@ -74,7 +74,12 @@ class Block {
                 console.log("dataaaaaaa" + l_data);
                 // Decoding the data to retrieve the JSON representation of the object
                 let l_jsonObject = JSON.parse(l_data);
-                resolve(l_jsonObject);
+                let json_ = {};
+                json_['owner'] = l_jsonObject.address
+                json_['start'] = l_jsonObject.star
+                json_['message'] = l_jsonObject.message
+                json_['signature'] = l_jsonObject.signature
+                resolve(json_);
            
         });
     }
