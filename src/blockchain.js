@@ -12,6 +12,7 @@ const SHA256 = require('crypto-js/sha256');
 const BlockClass = require('./block.js');
 const bitcoinMessage = require('bitcoinjs-message');
 const Block = require('bitcoinjs-lib/src/block');
+const { get } = require('express/lib/response');
 
 class Blockchain {
 
@@ -26,7 +27,7 @@ class Blockchain {
     constructor() {
         this.chain = [];
         this.height = -1;
-        this.time = 120;
+        this.time = (24*60)*7;
         this.initializeChain();
     }
 
@@ -66,16 +67,16 @@ class Blockchain {
     _addBlock(block) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            console.log(`ADDING BLOCK TO THE CHAIN. HEIGHT IS ${self.height}`)
-            block.time = new Date().getTime().toString().slice(0,-3); //time
-            if(self.height >= 0){
+            block.time = new Date().getTime().toString(); //time
+            if(self.height > 0){
                 block.previousBlockHash = self.chain[self.chain.length-1].hash;
             }
+            block.height = self.chain.length; //height of the block
+            
             block.hash = SHA256(JSON.stringify(block)).toString();
+            //block.hash = SHA256(JSON.stringify(block)).toString();
             self.chain.push(block);
             self.height = self.chain.length;
-            block.height = self.height-1; //height of the block
-            console.log(`ADDING BLOCK TO THE CHAIN. HEIGHT IS ${self.height}`)
         });
     }
 
@@ -128,7 +129,6 @@ class Blockchain {
             let time =  parseInt(message.split(':')[1]);
             let currenTime = parseInt(new Date().getTime().toString());
             let timeDiff = self.convertMilToMinut(currenTime,time);
-            console.log(`Submintting start to the chain --> ${self.height}`)
             if(timeDiff<=self.time){ // check time elapse 
                 let ok = bitcoinMessage.verify(message,address,signature); // we make sure the signature is correcte
                 if(ok){ 
@@ -223,19 +223,46 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             let index = 0;
             let found = false;
-            while (!found && index < this.chain.length-1) {
+            while (index < self.chain.length - 1) {
                 //validate the block
-                if(!this.chain[index].validate()) found =true;
+                let valid = self.chain[index].validate();
+                let block = self.chain[index].getBData();
+                valid.then((valid_) =>{
+                    console.log("eyyy!!")
+                    //TODO
+                    //console.log(valid_);
 
-                //validate the links
-                if(this.chain.length>1){ // on if we have more than one block in the chain
-                    let cur_hash = this.chain[index].hash;
-                    let prev_hash = this.chain[index+1];
-                    if(cur_hash!==prev_hash) found = true;
-                }
+                }).catch((err) =>{
+                    console.log(err);
+                });
+                // try {
+                //     let jsonObject = {};
+                //     let valid;
+                //    // valid = await self.chain[index].validate();
+                //     const block = self.chain[index];
+                //     //jsonObject = await block.getBData();
+                //     console.log("-------------------+//+---------------------");
+                //     console.log(await block.validate());
+                //     console.log("----------------------------")
+                //     // if (valid) {
+                //     //     errorLog.push(self._viewObject(jsonObject));
+                //     // }
+                //     // //validate the links
+                //     // else { // on if we have more than one block in the chain
+                //     //     // if (self.chain.length > 1) {
+                //     //     //     let cur_hash = self.chain[index].hash;
+                //     //     //     let prev_hash = self.chain[index + 1];
+                //     //     //     if (cur_hash !== prev_hash) {
+                //     //     //         errorLog.push(jsonObject)
+                //     //     //     }
+                //     //     // }
+                //     // }
+                // } catch (error) {
+                //     console.log(error)
+                // }
                 index++;
             }
-            !found ? resolve("VALID CHAIN!"): reject("CHAIN NOT VALID");
+            resolve(errorLog);
         });
     }
 

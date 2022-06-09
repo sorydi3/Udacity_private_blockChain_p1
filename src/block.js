@@ -39,13 +39,14 @@ class Block {
         let self = this;
         return new Promise((resolve, reject) => {
             // Save in auxiliary variable the current block hash
-            let l_curretHash = this.hash;                                
+            let l_curretHash = self.hash;                                
             // Recalculate the hash of the Block
-            let actualHash =  this.generateHashBlock();
+            let actualHash =  self.generateHashBlock(self);
+            console.log(`before: ${l_curretHash} &&  now: ${actualHash}`)
             // Comparing if the hashes changed
             if(l_curretHash===actualHash){
-                resolve("The block is valid!"); // returning the block is valid
-            }else reject("The block is not valid!") // returning the block is not valid
+                resolve(true); // returning the block is valid
+            }else reject(true) // returning the block is not valid
         });
     }
 
@@ -53,8 +54,9 @@ class Block {
      * 
      * @returns The hash value of the curren block 
      */
-    generateHashBlock(){
-        return SHA256(JSON.stringify(this)).toString();
+    generateHashBlock(block){
+        block.hash=null;
+        return SHA256(JSON.stringify(block)).toString();
     }
 
     /**
@@ -70,9 +72,8 @@ class Block {
         let self = this;
         return new Promise((resolve,reject) => {
                 // Getting the encoded data saved in the Block
+                if(self.height>0){
                 let l_data = hex2ascii(self.body);
-                console.log("dataaaaaaa" + l_data);
-                // Decoding the data to retrieve the JSON representation of the object
                 let l_jsonObject = JSON.parse(l_data);
                 let json_ = {};
                 json_['owner'] = l_jsonObject.address
@@ -80,6 +81,7 @@ class Block {
                 json_['message'] = l_jsonObject.message
                 json_['signature'] = l_jsonObject.signature
                 resolve(json_);
+                }else reject("ERROR GENESIS BLOCK!")
            
         });
     }

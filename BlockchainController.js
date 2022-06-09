@@ -17,15 +17,16 @@ class BlockchainController {
         this.getBlockByHash();
         this.getStarsByOwner();
         this.getChainHeight();
+        this.validateChain();
     }
 
     // Enpoint to Get a Block by Height (GET Endpoint)
     getBlockByHeight() {
         this.app.get("/block/height/:height", async (req, res) => {
-            if(req.params.height) {
+            if (req.params.height) {
                 const height = parseInt(req.params.height);
                 let block = await this.blockchain.getBlockByHeight(height);
-                if(block){
+                if (block) {
                     return res.status(200).json(block);
                 } else {
                     return res.status(404).send("Block Not Found!");
@@ -33,17 +34,17 @@ class BlockchainController {
             } else {
                 return res.status(404).send("Block Not Found! Review the Parameters!");
             }
-            
+
         });
     }
 
     // Endpoint that allows user to request Ownership of a Wallet address (POST Endpoint)
     requestOwnership() {
         this.app.post("/requestValidation", async (req, res) => {
-            if(req.body.address) {
+            if (req.body.address) {
                 const address = req.body.address;
                 const message = await this.blockchain.requestMessageOwnershipVerification(address);
-                if(message){
+                if (message) {
                     return res.status(200).json(message);
                 } else {
                     return res.status(500).send("An error happened!");
@@ -57,16 +58,15 @@ class BlockchainController {
     // Endpoint that allow Submit a Star, yu need first to `requestOwnership` to have the message (POST endpoint)
     submitStar() {
         this.app.post("/submitstar", async (req, res) => {
-            console.log(req.body);
-            if(req.body.address && req.body.message && req.body.signature && req.body.star) {
+            if (req.body.address && req.body.message && req.body.signature && req.body.star) {
                 const address = req.body.address;
                 const message = req.body.message;
                 const signature = req.body.signature;
                 const star = req.body.star;
                 try {
                     let block = await this.blockchain.submitStar(address, message, signature, star);
-                    
-                    if(block){
+
+                    if (block) {
                         return res.status(200).json(block);
                     } else {
                         return res.status(500).send("An error happened!");
@@ -83,10 +83,10 @@ class BlockchainController {
     // This endpoint allows you to retrieve the block by hash (GET endpoint)
     getBlockByHash() {
         this.app.get("/block/hash/:hash", async (req, res) => {
-            if(req.params.hash) {
+            if (req.params.hash) {
                 const hash = req.params.hash;
                 let block = await this.blockchain.getBlockByHash(hash);
-                if(block){
+                if (block) {
                     return res.status(200).json(block);
                 } else {
                     return res.status(404).send("Block Not Found!");
@@ -94,18 +94,18 @@ class BlockchainController {
             } else {
                 return res.status(404).send("Block Not Found! Review the Parameters!");
             }
-            
+
         });
     }
 
     // This endpoint allows you to request the list of Stars registered by an owner
     getStarsByOwner() {
         this.app.get("/blocks/:address", async (req, res) => {
-            if(req.params.address) {
+            if (req.params.address) {
                 const address = req.params.address;
                 try {
                     let stars = await this.blockchain.getStarsByWalletAddress(address);
-                    if(stars){
+                    if (stars) {
                         return res.status(200).json(stars);
                     } else {
                         return res.status(404).send("Block Not Found!");
@@ -116,21 +116,30 @@ class BlockchainController {
             } else {
                 return res.status(500).send("Block Not Found! Review the Parameters!");
             }
-            
+
         });
     }
 
-
-    getChainHeight(){
-        this.app.get("/chain/height",async (req,res) =>{
+    //GET THE HEIGHT OF THE CHAIN
+    getChainHeight() {
+        this.app.get("/chain/height", async (req, res) => {
             const height = await this.blockchain.getChainHeight();
-            //console.log(`THE HEIGHT OF THE CHAIN IS --> ${height}`)
-            if(height){
+            if (height) {
                 return res.status(200).json(height);
-            }else return res.status(404).send("EMPTY CHAIN!");
+            } else return res.status(404).send("EMPTY CHAIN!");
+        });
+    }
+
+    //THIS ENPOINT CHECK IF THE CHAIN IS VALID
+    validateChain() {
+        this.app.get("/validatechain", async (req, res) => {
+            const valid = await this.blockchain.validateChain();
+            if (valid) {
+                return res.status(200).json(valid);
+            } else return res.status(404).send("CHAIN IS NOT VALID!");
         });
     }
 
 }
 
-module.exports = (app, blockchainObj) => { return new BlockchainController(app, blockchainObj);}
+module.exports = (app, blockchainObj) => { return new BlockchainController(app, blockchainObj); }
