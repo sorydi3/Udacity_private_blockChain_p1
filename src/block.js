@@ -55,8 +55,11 @@ class Block {
      * @returns The hash value of the curren block 
      */
     generateHashBlock(block){
+        let hashAux = block.hash;
         block.hash=null;
-        return SHA256(JSON.stringify(block)).toString();
+        let hash = SHA256(JSON.stringify(block)).toString();
+        block.hash = hashAux;
+        return hash;
     }
 
     /**

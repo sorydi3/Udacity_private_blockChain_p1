@@ -27,7 +27,7 @@ class Blockchain {
     constructor() {
         this.chain = [];
         this.height = -1;
-        this.time = (24*60)*7;
+        this.time = (24 * 60) * 7;
         this.initializeChain();
     }
 
@@ -37,8 +37,8 @@ class Blockchain {
      * Passing as a data `{data: 'Genesis Block'}`
      */
     async initializeChain() {
-        if( this.height === -1){
-            let block = new BlockClass.Block({data: 'Genesis Block'});
+        if (this.height === -1) {
+            let block = new BlockClass.Block({ data: 'Genesis Block' });
             await this._addBlock(block);
         }
     }
@@ -68,11 +68,11 @@ class Blockchain {
         let self = this;
         return new Promise(async (resolve, reject) => {
             block.time = new Date().getTime().toString(); //time
-            if(self.height > 0){
-                block.previousBlockHash = self.chain[self.chain.length-1].hash;
+            if (self.height > 0) {
+                block.previousBlockHash = self.chain[self.chain.length - 1].hash;
             }
             block.height = self.chain.length; //height of the block
-            
+
             block.hash = SHA256(JSON.stringify(block)).toString();
             //block.hash = SHA256(JSON.stringify(block)).toString();
             self.chain.push(block);
@@ -103,7 +103,7 @@ class Blockchain {
      * @param {Date must be millisecond } Date2 
      * @returns 
      */
-     convertMilToMinut = (Date1,Date2) => Math.abs(Math.floor(((Date2-Date1)/1000)/60));
+    convertMilToMinut = (Date1, Date2) => Math.abs(Math.floor(((Date2 - Date1) / 1000) / 60));
 
 
     /**
@@ -126,27 +126,27 @@ class Blockchain {
     submitStar(address, message, signature, star) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            let time =  parseInt(message.split(':')[1]);
+            let time = parseInt(message.split(':')[1]);
             let currenTime = parseInt(new Date().getTime().toString());
-            let timeDiff = self.convertMilToMinut(currenTime,time);
-            if(timeDiff<=self.time){ // check time elapse 
-                let ok = bitcoinMessage.verify(message,address,signature); // we make sure the signature is correcte
-                if(ok){ 
-                    let block = new BlockClass.Block({star,message,address,signature});
+            let timeDiff = self.convertMilToMinut(currenTime, time);
+            if (timeDiff <= self.time) { // check time elapse 
+                let ok = bitcoinMessage.verify(message, address, signature); // we make sure the signature is correcte
+                if (ok) {
+                    let block = new BlockClass.Block({ star, message, address, signature });
                     self._addBlock(block)
-                    resolve( self._viewObject(await block.getBData()));
-                }else{
-                    reject("wrong signature!!"); 
+                    resolve(self._viewObject(await block.getBData()));
+                } else {
+                    reject("wrong signature!!");
                 }
-            }else{
-            let timeDiff = self.convertMilToMinut(currenTime,time);
+            } else {
+                let timeDiff = self.convertMilToMinut(currenTime, time);
                 resolve(`wrong time elapce ${timeDiff}`);
 
             }
         });
     }
 
-    
+
     /**
      * This method will return a Promise that will resolve with the Block
      *  with the hash passed as a parameter.
@@ -156,13 +156,13 @@ class Blockchain {
     getBlockByHash(hash) {
         let self = this;
         return new Promise((resolve, reject) => {
-           this.chain.forEach(block => {
-               if(block.hash === hash){
-                   resolve(block);
-                   return
-               }
-           });
-           reject("Block not found!")
+            this.chain.forEach(block => {
+                if (block.hash === hash) {
+                    resolve(block);
+                    return
+                }
+            });
+            reject("Block not found!")
         });
     }
 
@@ -175,7 +175,7 @@ class Blockchain {
         let self = this;
         return new Promise((resolve, reject) => {
             let block = self.chain.filter(p => p.height === height)[0];
-            if(block){
+            if (block) {
                 resolve(block);
             } else {
                 resolve(null);
@@ -189,14 +189,14 @@ class Blockchain {
      * Remember the star should be returned decoded.
      * @param {*} address 
      */
-    getStarsByWalletAddress (address) {
+    getStarsByWalletAddress(address) {
         let self = this;
         let stars = [];
         return new Promise(async (resolve, reject) => {
             for (let index = 1; index < self.chain.length; index++) {
                 const block = self.chain[index];
                 let jsonObject = await block.getBData();
-                let ok = bitcoinMessage.verify(jsonObject.message,address,jsonObject.signature);
+                let ok = bitcoinMessage.verify(jsonObject.message, address, jsonObject.signature);
                 if (ok) stars.push(self._viewObject(jsonObject));
             }
             resolve(stars);
@@ -204,7 +204,7 @@ class Blockchain {
     }
 
 
-    _viewObject (object) {
+    _viewObject(object) {
         let l_object = {};
         l_object['star'] = object.start;
         l_object['owner'] = object.owner;
@@ -219,50 +219,22 @@ class Blockchain {
      */
     validateChain() {
         let self = this;
-        let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            let index = 0;
+            let errorLog = [];
+            let index = 1;
             let found = false;
-            while (index < self.chain.length - 1) {
+            while (index < self.chain.length) {
                 //validate the block
-                let valid = self.chain[index].validate();
-                let block = self.chain[index].getBData();
-                valid.then((valid_) =>{
-                    console.log("eyyy!!")
-                    //TODO
-                    //console.log(valid_);
-
-                }).catch((err) =>{
-                    console.log(err);
-                });
-                // try {
-                //     let jsonObject = {};
-                //     let valid;
-                //    // valid = await self.chain[index].validate();
-                //     const block = self.chain[index];
-                //     //jsonObject = await block.getBData();
-                //     console.log("-------------------+//+---------------------");
-                //     console.log(await block.validate());
-                //     console.log("----------------------------")
-                //     // if (valid) {
-                //     //     errorLog.push(self._viewObject(jsonObject));
-                //     // }
-                //     // //validate the links
-                //     // else { // on if we have more than one block in the chain
-                //     //     // if (self.chain.length > 1) {
-                //     //     //     let cur_hash = self.chain[index].hash;
-                //     //     //     let prev_hash = self.chain[index + 1];
-                //     //     //     if (cur_hash !== prev_hash) {
-                //     //     //         errorLog.push(jsonObject)
-                //     //     //     }
-                //     //     // }
-                //     // }
-                // } catch (error) {
-                //     console.log(error)
-                // }
+                let valid = await self.chain[index].validate();
+                //get the block
+                let block = await self.chain[index].getBData();
+                if (!valid) { // check if the block is a valid one
+                    errorLog.push(self._viewObject(block));
+                }
                 index++;
             }
-            resolve(errorLog);
+
+            resolve(errorLog); //resolve the result (tempered blocks if any)
         });
     }
 
