@@ -1,0 +1,175 @@
+{
+	"info": {
+		"_postman_id": "46758d23-7d99-4da0-aaff-e143a2a60d45",
+		"name": "PROJECTE_PRIVATE_BLOCKCHAIN",
+		"description": "Api endpoint for my private blockchain",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET BLOCK BY HEIGHT",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/block/height/:height",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"block",
+						"height",
+						":height"
+					],
+					"variable": [
+						{
+							"key": "height",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "REQUEST VALIDATION",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"address\":\"bc1qnyf4f7sclljsxsr5ktwd992khn6dv3a2wgrea5\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/requestValidation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"requestValidation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SUBMIT A START",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"address\": \"mogoNszprRe59KQ9ArfxpXWRobZwJhaH5A\",\r\n    \"message\":\"mogoNszprRe59KQ9ArfxpXWRobZwJhaH5A:1654643133587:starRegistry\",\r\n    \"signature\":\"HwJrRVAnwYqV1aqlAisJ+NWfYr7njYWrf9M6wWRehQcRVU3cc669EkBX9AF3pEeoYOIFZYIxYIRAzWrRqLDfXGA=\",\r\n    \"star\":{\r\n      \"dec\": \"nothing\",\r\n      \"ra\": 16,\r\n      \"story\": \"Testing\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/submitstar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"submitstar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET BLOCK BY HASH",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/block/hash/?hash=\"sdsd\"",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"block",
+						"hash",
+						""
+					],
+					"query": [
+						{
+							"key": "hash",
+							"value": "\"sdsd\""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "THIS ENDPOINT ALLOWS TO RQUEST THE LIST OF STARTS REGISTERED  BY AN OWNER",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/block/height/:height",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"block",
+						"height",
+						":height"
+					],
+					"variable": [
+						{
+							"key": "height",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET CHAIN HEIGHT",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/chain/height",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"chain",
+						"height"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "THIS ENPOINT CHECK IF THE CHAIN IS VALID",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

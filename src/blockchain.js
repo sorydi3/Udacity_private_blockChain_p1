@@ -140,7 +140,7 @@ class Blockchain {
                 }
             } else {
                 let timeDiff = self.convertMilToMinut(currenTime, time);
-                resolve(`wrong time elapce ${timeDiff}`);
+                reject(`wrong time elapce ${timeDiff}`);
 
             }
         });
@@ -156,13 +156,13 @@ class Blockchain {
     getBlockByHash(hash) {
         let self = this;
         return new Promise((resolve, reject) => {
-            this.chain.forEach(block => {
-                if (block.hash === hash) {
-                    resolve(block);
-                    return
-                }
-            });
-            reject("Block not found!")
+            //let found =  false;
+            let block = self.chain.filter(p => p.hash === hash)[0];
+            if (block) {
+                resolve(block);
+            } else {
+                resolve(null);
+            }
         });
     }
 
@@ -237,7 +237,6 @@ class Blockchain {
             resolve(errorLog); //resolve the result (tempered blocks if any)
         });
     }
-
 }
 
 module.exports.Blockchain = Blockchain;   

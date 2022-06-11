@@ -65,11 +65,12 @@ class BlockchainController {
                 const star = req.body.star;
                 try {
                     let block = await this.blockchain.submitStar(address, message, signature, star);
-
-                    if (block) {
+                    let chainValid = await this.blockchain.validateChain();
+                    let valid = JSON.parse(JSON.stringify(chainValid)).length === 0;//length
+                    if (block && valid) {
                         return res.status(200).json(block);
                     } else {
-                        return res.status(500).send("An error happened!");
+                        return res.status(500).send("An error happened! Chaine might be invalid.");
                     }
                 } catch (error) {
                     return res.status(500).send(error);
@@ -139,6 +140,7 @@ class BlockchainController {
             } else return res.status(404).send("CHAIN IS NOT VALID!");
         });
     }
+
 
 }
 

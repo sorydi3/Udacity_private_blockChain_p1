@@ -42,7 +42,7 @@ class Block {
             let l_curretHash = self.hash;                                
             // Recalculate the hash of the Block
             let actualHash =  self.generateHashBlock(self);
-            console.log(`before: ${l_curretHash} &&  now: ${actualHash}`)
+            //console.log(`before: ${l_curretHash} &&  now: ${actualHash}`)
             // Comparing if the hashes changed
             if(l_curretHash===actualHash){
                 resolve(true); // returning the block is valid
