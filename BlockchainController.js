@@ -65,9 +65,7 @@ class BlockchainController {
                 const star = req.body.star;
                 try {
                     let block = await this.blockchain.submitStar(address, message, signature, star);
-                    let chainValid = await this.blockchain.validateChain();
-                    let valid = JSON.parse(JSON.stringify(chainValid)).length === 0;//length
-                    if (block && valid) {
+                    if (block) {
                         return res.status(200).json(block);
                     } else {
                         return res.status(500).send("An error happened! Chaine might be invalid.");

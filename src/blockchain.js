@@ -77,6 +77,7 @@ class Blockchain {
             //block.hash = SHA256(JSON.stringify(block)).toString();
             self.chain.push(block);
             self.height = self.chain.length;
+            
         });
     }
 
@@ -129,7 +130,9 @@ class Blockchain {
             let time = parseInt(message.split(':')[1]);
             let currenTime = parseInt(new Date().getTime().toString());
             let timeDiff = self.convertMilToMinut(currenTime, time);
-            if (timeDiff <= self.time) { // check time elapse 
+            let chainValid = await self.validateChain();
+            let valid = JSON.parse(JSON.stringify(chainValid)).length === 0;//length
+            if (timeDiff <= self.time && valid) { // check time elapse and also check if the chain is valid
                 let ok = bitcoinMessage.verify(message, address, signature); // we make sure the signature is correcte
                 if (ok) {
                     let block = new BlockClass.Block({ star, message, address, signature });

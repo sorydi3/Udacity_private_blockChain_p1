@@ -44,10 +44,13 @@ class Block {
             let actualHash =  self.generateHashBlock(self);
             //console.log(`before: ${l_curretHash} &&  now: ${actualHash}`)
             // Comparing if the hashes changed
-            if(l_curretHash===actualHash){
-                resolve(true); // returning the block is valid
-            }else reject(true) // returning the block is not valid
+           let valid = self.hash ===SHA256(JSON.stringify({...self,"hash":null})).toString();
+           resolve(valid); // returning the block is valid
+            
         });
+
+
+        return 
     }
 
     /**
