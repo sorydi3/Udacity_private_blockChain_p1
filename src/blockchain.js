@@ -28,7 +28,8 @@ class Blockchain {
     constructor() {
         this.chain = [];
         this.height = -1;
-        this.time = (60*24)*30;
+        //this.time = (60*24)*30;
+        this.time = 5; // time is in minuts
         this.initializeChain();
     }
 
