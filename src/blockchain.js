@@ -13,6 +13,7 @@ const BlockClass = require('./block.js');
 const bitcoinMessage = require('bitcoinjs-message');
 const Block = require('bitcoinjs-lib/src/block');
 const { get } = require('express/lib/response');
+const log = require('debug')('http');
 
 class Blockchain {
 
@@ -27,7 +28,7 @@ class Blockchain {
     constructor() {
         this.chain = [];
         this.height = -1;
-        this.time = 5;
+        this.time = (60*24)*30;
         this.initializeChain();
     }
 
@@ -74,9 +75,16 @@ class Blockchain {
             block.height = self.chain.length; //height of the block
 
             block.hash = SHA256(JSON.stringify(block)).toString();
-            //block.hash = SHA256(JSON.stringify(block)).toString();
-            self.chain.push(block);
-            self.height = self.chain.length;
+
+            //CHECK IF THE CHAIN IS VALID BEFORE ADDING A NEW BLOCK TO THE CHAIN
+            let chainValid = await self.validateChain();
+            let isValidChain = JSON.parse(JSON.stringify(chainValid)).length === 0;//length
+            if(isValidChain){
+                self.chain.push(block);
+                self.height = self.chain.length;
+                log("BLOCK ADDED SUCCEFULY");
+                resolve(block)
+            }else reject(null);
             
         });
     }
@@ -130,9 +138,7 @@ class Blockchain {
             let time = parseInt(message.split(':')[1]);
             let currenTime = parseInt(new Date().getTime().toString());
             let timeDiff = self.convertMilToMinut(currenTime, time);
-            let chainValid = await self.validateChain();
-            let valid = JSON.parse(JSON.stringify(chainValid)).length === 0;//length
-            if (timeDiff <= self.time && valid) { // check time elapse and also check if the chain is valid
+            if (timeDiff <= self.time) { // check time elapse and also check if the chain is valid
                 let ok = bitcoinMessage.verify(message, address, signature); // we make sure the signature is correcte
                 if (ok) {
                     let block = new BlockClass.Block({ star, message, address, signature });
@@ -160,7 +166,7 @@ class Blockchain {
         let self = this;
         return new Promise((resolve, reject) => {
             //let found =  false;
-            let block = self.chain.filter(p => p.hash === hash)[0];
+            let block = self.chain.find(p => p.hash === hash);
             if (block) {
                 resolve(block);
             } else {
