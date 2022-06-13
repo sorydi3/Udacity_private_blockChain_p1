@@ -28,8 +28,9 @@ class Blockchain {
     constructor() {
         this.chain = [];
         this.height = -1;
-        //this.time = (60*24)*30;
-        this.time = 5; // time is in minuts
+        this.time = ((60*60)*24)*30;
+        ///this.time = 5; // time is in minuts
+        this.dificulty = 2;
         this.initializeChain();
     }
 
@@ -69,24 +70,34 @@ class Blockchain {
     _addBlock(block) {
         let self = this;
         return new Promise(async (resolve, reject) => {
+
             block.time = new Date().getTime().toString(); //time
             if (self.height > 0) {
                 block.previousBlockHash = self.chain[self.chain.length - 1].hash;
             }
             block.height = self.chain.length; //height of the block
-
             block.hash = SHA256(JSON.stringify(block)).toString();
+            let index = 0;
+
+            // simulate the block dificulty by incrementing the index until 
+            // we find enought zeros at the begining of our hash that match the block  dificulty we've set.
+            while (block.hash.substring(0, self.dificulty) !== Array(this.dificulty + 1).join("0")) {
+                block.nonce = index;
+                block.hash = SHA256(JSON.stringify(block)).toString();
+                console.log(`HASH: ${block.hash} NONCE: ${block.nonce}`);
+                index++;
+            }
 
             //CHECK IF THE CHAIN IS VALID BEFORE ADDING A NEW BLOCK TO THE CHAIN
             let chainValid = await self.validateChain();
             let isValidChain = JSON.parse(JSON.stringify(chainValid)).length === 0;//length
-            if(isValidChain){
+            if (isValidChain) {
                 self.chain.push(block);
                 self.height = self.chain.length;
                 log("BLOCK ADDED SUCCEFULY");
                 resolve(block)
-            }else reject(null);
-            
+            } else reject(null);
+
         });
     }
 
@@ -218,6 +229,7 @@ class Blockchain {
         let l_object = {};
         l_object['star'] = object.start;
         l_object['owner'] = object.owner;
+        l_object['nonce'] = object.nonce;
         return l_object;
     }
 
