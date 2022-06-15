@@ -125,7 +125,7 @@ class BlockchainController {
             const height = await this.blockchain.getChainHeight();
             if (height) {
                 return res.status(200).json(height);
-            } else return res.status(404).send("EMPTY CHAIN!");
+            } else return res.status(404).send("THIS CHAIN LOOK EMPTY! SUBMIT SOME STARS.");
         });
     }
 
@@ -135,7 +135,7 @@ class BlockchainController {
             const valid = await this.blockchain.validateChain();
             if (valid) {
                 return res.status(200).json(valid);
-            } else return res.status(404).send("CHAIN IS NOT VALID!");
+            } else return res.status(404).send("THIS CHAIN IS NOT VALID! DATA HAVE BEEN TEMPERED WITH.");
         });
     }
 
